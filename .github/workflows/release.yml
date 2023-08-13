@@ -13,6 +13,7 @@ jobs:
     - uses: actions/setup-node@v3
       with:
         cache: npm
+        cache-dependency-path: src/package-lock.json
     - name: Build
       run: npm install
   publish:
