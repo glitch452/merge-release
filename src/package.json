@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mikeal/auto-release.git"
+    "url": "git+https://github.com/Github-Actions-Community/auto-release.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mikeal/auto-release/issues"
+    "url": "https://github.com/Github-Actions-Community/auto-release/issues"
   },
-  "homepage": "https://github.com/mikeal/auto-release#readme",
+  "homepage": "https://github.com/Github-Actions-Community/auto-release#readme",
   "dependencies": {
     "bent": "1.5.13",
     "simple-git": "^1.113.0",

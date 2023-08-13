@@ -1,9 +1,9 @@
 FROM node:18-slim
 
 LABEL version="1.0.0"
-LABEL repository="http://github.com/mikeal/merge-release"
+LABEL repository="http://github.com/Github-Actions-Community/merge-release"
 LABEL homepage="http://github.com/merge-release"
-LABEL maintainer="Mikeal Rogers <mikeal.rogers@gmail.com>"
+LABEL maintainer="Github-Actions-Community Rogers <Github-Actions-Community.rogers@gmail.com>"
 
 LABEL com.github.actions.name="Automated releases for npm packages."
 LABEL com.github.actions.description="Release npm package based on commit metadata."
