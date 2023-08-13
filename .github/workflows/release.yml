@@ -15,7 +15,9 @@ jobs:
         cache: npm
         cache-dependency-path: src/package-lock.json
     - name: Build
-      run: npm install
+      run: cd src && npm install
+    - name: Test
+      run: cd src && npm test
   publish:
     name: Publish
     needs: test
@@ -28,7 +30,9 @@ jobs:
           cache: npm
           cache-dependency-path: src/package-lock.json
       - name: Build
-        run: npm install
+        run: cd src && npm install
+      - name: Test
+        run: cd src && npm test
       - name: Publish
         uses: github-actions-community/merge-release@main
         env:
