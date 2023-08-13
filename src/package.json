@@ -1,5 +1,5 @@
 {
-  "name": "merge-release",
+  "name": "@github-actions-community/merge-release",
   "version": "0.0.0-dev",
   "description": "",
   "scripts": {
