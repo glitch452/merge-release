@@ -1,5 +1,8 @@
 name: 'Merge Release'
-description: 'Deploy to npm!'
+description: 'Deploy your package to NPM and Github using semantic versioning'
+branding:
+  icon: 'upload-cloud'
+  color: 'purple'
 runs: 
   using: 'docker'
   image: 'Dockerfile'
