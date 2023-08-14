@@ -2,7 +2,7 @@
 
 GitHub Action for automated npm publishing.
 
-This Action publishes a package to npm. It is meant to be used on every successful merge to master but 
+This Action publishes a package to npm. It is meant to be used on every successful merge to main but 
 you'll need to configure that workflow yourself. You can look to the
 [`.github/workflows/push.yml`](./.github/workflows/release.yml) file in this project as an example.
 
@@ -40,7 +40,7 @@ You can configure some aspects of merge-release action by passing some environme
 `merge-release` will use `npm publish` unless you've defined a `publish` script in your `package.json`.
 
 ```yaml
-- uses: Github-Actions-Community/merge-release@master
+- uses: Github-Actions-Community/merge-release@main
   env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
