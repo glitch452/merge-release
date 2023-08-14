@@ -29,10 +29,10 @@ const srcPackageDir = path.join(process.cwd(), process.env.SRC_PACKAGE_DIR || '.
 console.log('            using deploy directory : ' + deployDir)
 console.log('using src directory (package.json) : ' + srcPackageDir)
 
-const access = process.env.NPM_PRIVATE==='true' ? 'restricted' : 'public'
+const access = process.env.NPM_PRIVATE === 'true' ? 'restricted' : 'public'
 
 console.log('deploy to NPM with access : ' + access)
-  
+
 let pkg = require(path.join(deployDir, 'package.json'))
 
 const run = async () => {
@@ -97,7 +97,7 @@ const run = async () => {
   exec(`git checkout package.json`) // cleanup
   exec(`git tag ${newVersion}`)
   exec(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`)
-  
+
   const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`
   exec(`git push ${remote} --tags`)
 }
