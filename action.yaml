@@ -13,6 +13,9 @@ inputs:
   NPM_AUTH_TOKEN:
     description: 'NPM_AUTH_TOKEN' 
     required: true
+  NPM_PRIVATE:
+    description: 'NPM_PRIVATE' 
+    required: false
   DEPLOY_DIR:
     description: 'DEPLOY_DIR' 
     required: false

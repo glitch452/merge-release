@@ -29,6 +29,10 @@ const srcPackageDir = path.join(process.cwd(), process.env.SRC_PACKAGE_DIR || '.
 console.log('            using deploy directory : ' + deployDir)
 console.log('using src directory (package.json) : ' + srcPackageDir)
 
+const access = process.env.NPM_PRIVATE==='true' ? 'restricted' : 'public'
+
+console.log('deploy to NPM with access : ' + access)
+  
 let pkg = require(path.join(deployDir, 'package.json'))
 
 const run = async () => {
@@ -88,7 +92,7 @@ const run = async () => {
   if (pkg.scripts && pkg.scripts.publish) {
     exec(`npm run publish`, deployDir)
   } else {
-    exec(`npm publish`, deployDir)
+    exec(`npm publish --access=${access}`, deployDir)
   }
   exec(`git checkout package.json`) // cleanup
   exec(`git tag ${newVersion}`)
