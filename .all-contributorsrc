@@ -1,0 +1,26 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "achingbrain",
+      "name": "Alex Potsides",
+      "avatar_url": "https://avatars.githubusercontent.com/u/665810?v=4",
+      "profile": "http://www.achingbrain.net",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "skipCi": true,
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "projectName": "merge-release",
+  "projectOwner": "Github-Actions-Community"
+}
