@@ -1,7 +1,7 @@
 # ![LogoMakr-2ULBLV](https://github.com/Github-Actions-Community/merge-release/assets/3071208/bb7d9b4c-04bd-41c5-9c08-0ee5c91fa4a1)
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 GitHub Action for automated npm publishing.
@@ -67,6 +67,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://mikealrogers.com"><img src="https://avatars.githubusercontent.com/u/579?v=4?s=100" width="100px;" alt="Mikeal Rogers"/><br /><sub><b>Mikeal Rogers</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=mikeal" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.achingbrain.net"><img src="https://avatars.githubusercontent.com/u/665810?v=4?s=100" width="100px;" alt="Alex Potsides"/><br /><sub><b>Alex Potsides</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=achingbrain" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.kanekotic.com"><img src="https://avatars.githubusercontent.com/u/3071208?v=4?s=100" width="100px;" alt="Alvaro Jose"/><br /><sub><b>Alvaro Jose</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=kanekotic" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://jonjoe.io"><img src="https://avatars.githubusercontent.com/u/2996688?v=4?s=100" width="100px;" alt="Jonjoe Whitfield"/><br /><sub><b>Jonjoe Whitfield</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=Jonjoe" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
