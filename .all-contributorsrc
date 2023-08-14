@@ -15,6 +15,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "kanekotic",
+      "name": "Alvaro Jose",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3071208?v=4",
+      "profile": "http://www.kanekotic.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
