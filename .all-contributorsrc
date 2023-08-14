@@ -15,6 +15,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mikeal",
+      "name": "Mikeal Rogers",
+      "avatar_url": "https://avatars.githubusercontent.com/u/579?v=4",
+      "profile": "http://mikealrogers.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
