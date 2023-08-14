@@ -94,7 +94,7 @@ const run = async () => {
   } else {
     exec(`npm publish --access=${access}`, deployDir)
   }
-  exec(`git checkout package.json`) // cleanup
+  exec(`git checkout ${path.join(deployDir, 'package.json')}`) // cleanup
   exec(`git tag ${newVersion}`)
   exec(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`)
 
