@@ -1,4 +1,5 @@
-## merge-release
+# ![LogoMakr-2ULBLV](https://github.com/Github-Actions-Community/merge-release/assets/3071208/bb7d9b4c-04bd-41c5-9c08-0ee5c91fa4a1)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -61,9 +62,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <table>
   <tbody>
     <tr>
+      <td align="center" valign="top" width="14.28%"><a href="http://mikealrogers.com"><img src="https://avatars.githubusercontent.com/u/579?v=4?s=100" width="100px;" alt="Mikeal Rogers"/><br /><sub><b>Mikeal Rogers</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=mikeal" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.achingbrain.net"><img src="https://avatars.githubusercontent.com/u/665810?v=4?s=100" width="100px;" alt="Alex Potsides"/><br /><sub><b>Alex Potsides</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=achingbrain" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="http://www.kanekotic.com"><img src="https://avatars.githubusercontent.com/u/3071208?v=4?s=100" width="100px;" alt="Alvaro Jose"/><br /><sub><b>Alvaro Jose</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=kanekotic" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://mikealrogers.com"><img src="https://avatars.githubusercontent.com/u/579?v=4?s=100" width="100px;" alt="Mikeal Rogers"/><br /><sub><b>Mikeal Rogers</b></sub></a><br /><a href="https://github.com/Github-Actions-Community/merge-release/commits?author=mikeal" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
@@ -74,3 +75,5 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+##### Created my free [logo](https://logomakr.com/5sISSS) at [LogoMakr.com](LogoMakr.com) 
