@@ -8,6 +8,15 @@
   "commitConvention": "angular",
   "contributors": [
     {
+      "login": "mikeal",
+      "name": "Mikeal Rogers",
+      "avatar_url": "https://avatars.githubusercontent.com/u/579?v=4",
+      "profile": "http://mikealrogers.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
       "login": "achingbrain",
       "name": "Alex Potsides",
       "avatar_url": "https://avatars.githubusercontent.com/u/665810?v=4",
@@ -17,10 +26,10 @@
       ]
     },
     {
-      "login": "mikeal",
-      "name": "Mikeal Rogers",
-      "avatar_url": "https://avatars.githubusercontent.com/u/579?v=4",
-      "profile": "http://mikealrogers.com",
+      "login": "kanekotic",
+      "name": "Alvaro Jose",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3071208?v=4",
+      "profile": "http://www.kanekotic.com",
       "contributions": [
         "code"
       ]
