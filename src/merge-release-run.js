@@ -40,7 +40,7 @@ const run = async () => {
   let latest;
   try {
     latest = await get(pkg.name + '/latest');
-  } catch (e) {
+  } catch {
     // unpublished
   }
 
@@ -55,7 +55,7 @@ const run = async () => {
           to: process.env.GITHUB_SHA,
         });
         messages = logs.all.map((r) => r.message + '\n' + r.body);
-      } catch (e) {
+      } catch {
         latest = null;
       }
       // g.log({from: 'f0002b6c9710f818b9385aafeb1bde994fe3b370', to: '53a92ca2d1ea3c55977f44d93e48e31e37d0bc69'}, (err, l) => console.log(l.all.map(r => r.message + '\n' + r.body)))
