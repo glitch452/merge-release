@@ -39,5 +39,3 @@ git branch --verbose
 
 # Dependencies are installed at build time
 node /src/merge-release-run.js "$@" || exit 1
-
-git push "${remote_repo}" --tags
