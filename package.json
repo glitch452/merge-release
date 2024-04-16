@@ -2,6 +2,7 @@
   "name": "@github-actions-community/merge-release",
   "version": "5.0.0",
   "description": "",
+  "type": "module",
   "scripts": {
     "lint": "eslint --fix 'src/**/*.js'",
     "test": "eslint 'src/**/*.js'"

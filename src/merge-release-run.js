@@ -1,10 +1,13 @@
 #!/usr/bin/env node
-const fs = require('fs');
-const path = require('path');
-const bent = require('bent');
-const git = require('simple-git')();
-const { execSync, spawnSync } = require('child_process');
-const { promisify } = require('util');
+
+import * as fs from 'fs';
+import * as path from 'path';
+import bent from 'bent';
+import simpleGit from 'simple-git';
+import { execSync, spawnSync } from 'child_process';
+import { promisify } from 'util';
+
+const git = simpleGit();
 
 const exec = (str, cwd) => {
   const [cmd, ...args] = str.split(' ');
@@ -35,9 +38,9 @@ const access = process.env.NPM_PRIVATE === 'true' ? 'restricted' : 'public';
 
 console.log('deploy to NPM with access : ' + access);
 
-let pkg = require(path.join(deployDir, 'package.json'));
-
 const run = async () => {
+  const pkg = JSON.parse(fs.readFileSync(path.join(deployDir, 'package.json')));
+
   if (!process.env.NPM_AUTH_TOKEN) throw new Error('Merge-release requires NPM_AUTH_TOKEN');
   let latest;
   try {
