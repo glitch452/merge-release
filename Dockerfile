@@ -1,4 +1,4 @@
-FROM node:18-slim
+FROM node:20-slim
 
 LABEL version="1.0.0"
 LABEL repository="http://github.com/Github-Actions-Community/merge-release"
