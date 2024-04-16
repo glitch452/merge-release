@@ -15,7 +15,7 @@ RUN apt-get update && apt-get -y --no-install-recommends install git jq findutil
 COPY . .
 
 # Install dependencies here
-RUN npm i
+RUN npm ci --omit dev
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["help"]
