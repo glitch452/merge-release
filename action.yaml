@@ -1,39 +1,42 @@
-name: 'Merge Release'
-description: 'Deploy your package to NPM and Github using semantic versioning'
+name: Merge Release
+description: Deploy your package to NPM and Github using semantic versioning
 branding:
-  icon: 'upload-cloud'
-  color: 'purple'
-runs: 
-  using: 'docker'
-  image: 'Dockerfile'
+  icon: upload-cloud
+  color: purple
+runs:
+  using: docker
+  image: Dockerfile
 inputs:
   GITHUB_TOKEN:
-    description: 'GITHUB_TOKEN' 
+    description: GITHUB_TOKEN
     required: true
   NPM_AUTH_TOKEN:
-    description: 'NPM_AUTH_TOKEN' 
+    description: NPM_AUTH_TOKEN
     required: true
   NPM_PRIVATE:
-    description: 'NPM_PRIVATE' 
+    description: NPM_PRIVATE
     required: false
   DEPLOY_DIR:
-    description: 'DEPLOY_DIR' 
+    description: DEPLOY_DIR
     required: false
   NPM_REGISTRY_URL:
-    description: 'NPM_REGISTRY_URL' 
+    description: NPM_REGISTRY_URL
+    required: false
+  DISABLE_GIT_TAG:
+    description: Set to `true` to disable the git tag feature
     required: false
   GIT_TAG_SUFFIX:
-    description: 'GIT_TAG_SUFFIX' 
+    description: GIT_TAG_SUFFIX
     required: false
   SRC_PACKAGE_DIR:
-    description: 'SRC_PACKAGE_DIR' 
+    description: SRC_PACKAGE_DIR
     required: false
   GITHUB_SHA:
-    description: 'GITHUB_SHA' 
+    description: GITHUB_SHA
     required: false
   GITHUB_ACTOR:
-    description: 'GITHUB_ACTOR' 
+    description: GITHUB_ACTOR
     required: false
   GITHUB_REPOSITORY:
-    description: 'GITHUB_REPOSITORY' 
+    description: GITHUB_REPOSITORY
     required: false

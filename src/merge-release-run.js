@@ -21,6 +21,8 @@ const getlog = promisify(git.log.bind(git));
 
 const get = bent('json', process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/');
 
+const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
+
 const event = JSON.parse(fs.readFileSync('/github/workflow/event.json').toString());
 
 const deployDir = path.join(process.cwd(), process.env.DEPLOY_DIR || './');
@@ -109,11 +111,15 @@ const run = async () => {
   } else {
     exec(`npm publish --access=${access}`, deployDir);
   }
+
   exec(`git checkout ${path.join(deployDir, 'package.json')}`); // cleanup
-  exec(`git tag ${newVersion}`);
   exec(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
 
-  const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
-  exec(`git push ${remote} --tags`);
+  if (!disableGitTag) {
+    exec(`git tag ${newVersion}`);
+    const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+    exec(`git push ${remote} --tags`);
+  }
 };
+
 run();
