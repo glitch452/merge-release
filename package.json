@@ -6,7 +6,7 @@
     "test": "standard"
   },
   "bin": {
-    "merge-release": "./merge-release-run.js"
+    "merge-release": "./src/merge-release-run.js"
   },
   "repository": {
     "type": "git",
