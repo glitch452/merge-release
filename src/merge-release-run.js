@@ -10,6 +10,8 @@ import { promisify } from 'util';
 const git = simpleGit();
 const gitLog = promisify(git.log.bind(git));
 
+const debug = process.env.DEBUG?.toLowerCase() === 'true';
+const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
 const minorTagsRegex = new RegExp('^(feat)');
 
 /**
@@ -18,13 +20,19 @@ const minorTagsRegex = new RegExp('^(feat)');
  * @returns {ReturnType<typeof _spawnSync>}
  */
 function spawnSync(command, cwd) {
+  if (debug) {
+    console.debug(`Spawning shell to run command "${command}"`);
+  }
+
   const [cmd, ...args] = command.split(' ');
   const ret = _spawnSync(cmd, args, { cwd, stdio: 'inherit' });
+
   if (ret.status) {
     console.error(ret);
     console.error(`Error: "${command}" returned non-zero exit code`);
     process.exit(ret.status);
   }
+
   return ret;
 }
 
@@ -35,9 +43,13 @@ function spawnSync(command, cwd) {
  */
 function execSync(command, options) {
   try {
+    if (debug) {
+      console.debug(`Running command "${command}".`);
+    }
+
     return _execSync(command, options);
   } catch (e) {
-    console.error(`Failed to run command "${command}"`);
+    console.error(`Failed to run command "${command}"`, e);
     throw e;
   }
 }
@@ -63,104 +75,143 @@ function isMinorChange(message) {
   return minorTagsRegex.test(firstLine);
 }
 
-const get = bent('json', process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/');
-
-const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
-
+const registryUrl = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/';
+const getFromRegistry = bent('json', registryUrl);
 const event = JSON.parse(fs.readFileSync('/github/workflow/event.json').toString());
+const deployDir = path.join(process.cwd(), process.env.DEPLOY_DIR || '.');
+const srcPackageDir = path.join(process.cwd(), process.env.SRC_PACKAGE_DIR || '.');
+const access = process.env.NPM_PRIVATE?.toLowerCase() === 'true' ? 'restricted' : 'public';
 
-const deployDir = path.join(process.cwd(), process.env.DEPLOY_DIR || './');
-const srcPackageDir = path.join(process.cwd(), process.env.SRC_PACKAGE_DIR || './');
+console.log('Configuration:');
+if (debug) {
+  console.log(`                       Debug Enabled: true`);
+}
+console.log(`                  Using registry url: ${registryUrl}`);
+console.log(`              Using deploy directory: ${deployDir}`);
+console.log(`  Using src directory (package.json): ${srcPackageDir}`);
+console.log(`           Deploy to NPM with access: ${access}`);
+console.log(`                         Git Tagging: ${disableGitTag ? 'Disabled' : 'Enabled'}`);
 
-console.log('            using deploy directory : ' + deployDir);
-console.log('using src directory (package.json) : ' + srcPackageDir);
-
-const access = process.env.NPM_PRIVATE === 'true' ? 'restricted' : 'public';
-
-console.log('deploy to NPM with access : ' + access);
-
-const run = async () => {
+async function run() {
   const pkg = JSON.parse(fs.readFileSync(path.join(deployDir, 'package.json')));
 
-  if (!process.env.NPM_AUTH_TOKEN) throw new Error('Merge-release requires NPM_AUTH_TOKEN');
+  if (!process.env.NPM_AUTH_TOKEN) {
+    throw new Error('Merge-release requires NPM_AUTH_TOKEN');
+  }
+
   let latest;
+
   try {
-    latest = await get(pkg.name + '/latest');
-  } catch {
-    // unpublished
+    const path = `${pkg.name}/latest`;
+    if (debug) {
+      console.debug(`Attempting to get the latest with path "${path}"`);
+    }
+    latest = await getFromRegistry(path);
+    if (debug) {
+      console.debug('Successfully retrieved latest:', { gitHead: latest.gitHead });
+    }
+  } catch (e) {
+    // Unpublished
+    if (debug) {
+      console.debug('Failed to get the latest package. Error:', e);
+    }
   }
 
   /** @type {string[] | undefined} */
   let messages;
 
   if (latest) {
-    if (latest.gitHead === process.env.GITHUB_SHA) return console.log('SHA matches latest release, skipping.');
+    if (latest.gitHead === process.env.GITHUB_SHA) {
+      console.log('SHA matches latest release, skipping.');
+      return;
+    }
+
     if (latest.gitHead) {
+      if (debug) {
+        console.debug('latest.gitHead is truthy');
+      }
+
       try {
-        let logs = await gitLog({
-          from: latest.gitHead,
-          to: process.env.GITHUB_SHA,
-        });
+        const logs = await gitLog({ from: latest.gitHead, to: process.env.GITHUB_SHA });
+        if (debug) {
+          console.debug('git logs retrieved:', logs);
+        }
+
         messages = logs.all.map((r) => r.message + '\n' + r.body);
-      } catch {
+      } catch (e) {
+        if (debug) {
+          console.debug('git log failed. Error:', e);
+        }
         latest = null;
       }
-      // g.log({from: 'f0002b6c9710f818b9385aafeb1bde994fe3b370', to: '53a92ca2d1ea3c55977f44d93e48e31e37d0bc69'}, (err, l) => console.log(l.all.map(r => r.message + '\n' + r.body)))
     } else {
       latest = null;
     }
   }
+
+  // Re-check latest incase it was set to null above
   if (!latest) {
+    if (debug) {
+      console.debug('Log retrieval using latest failed, using event commits instead:', event.commits);
+    }
+
     messages = (event.commits || []).map((commit) => commit.message + '\n' + commit.body);
   }
 
-  let version = 'patch';
-  if (messages.map(isMajorChange).includes(true)) {
-    version = 'major';
-  } else if (messages.map(isMinorChange).includes(true)) {
-    version = 'minor';
+  if (debug) {
+    console.debug('messages:', messages);
   }
 
-  let currentVersion = execSync(`npm view ${pkg.name} version`, {
-    cwd: srcPackageDir,
-  }).toString();
+  let incrementType = 'patch';
+  if (messages.map(isMajorChange).includes(true)) {
+    incrementType = 'major';
+  } else if (messages.map(isMinorChange).includes(true)) {
+    incrementType = 'minor';
+  }
+
+  if (debug) {
+    console.debug('version incrementType type:', incrementType);
+  }
+
+  let currentVersion = execSync(`npm view ${pkg.name} version`, { cwd: srcPackageDir }).toString().trim();
 
   setVersion(currentVersion, srcPackageDir);
   if (srcPackageDir !== deployDir) {
     setVersion(currentVersion, deployDir);
   }
 
-  console.log('current:', currentVersion, '/', 'version:', version);
-  let newVersion = execSync(`npm version --git-tag-version=false ${version}`, {
-    cwd: srcPackageDir,
-  }).toString();
-  newVersion = newVersion
-    .trim()
-    .split(/(\r\n|\n|\r)/gm)
-    .filter((word) => !/(\r\n|\n|\r)/.test(word))
-    .pop();
+  console.log('Version Info:');
+  console.log('   Current Version:', `v${currentVersion}`);
+  console.log('   Version Increment Type:', incrementType);
+
+  const newVersion = execSync(`npm version --git-tag-version=false ${incrementType}`, { cwd: srcPackageDir })
+    .toString()
+    .trim();
 
   setVersion(newVersion.slice(1), srcPackageDir);
   if (srcPackageDir !== deployDir) {
     setVersion(newVersion.slice(1), deployDir);
   }
 
-  console.log('new version:', newVersion);
+  console.log('   New Version:', newVersion);
 
-  if (pkg.scripts && pkg.scripts.publish) {
+  if (pkg?.scripts?.publish) {
     spawnSync(`npm run publish`, deployDir);
   } else {
-    spawnSync(`npm publish --access=${access}`, deployDir);
+    const verbose = debug ? ' --verbose' : '';
+    spawnSync(`npm publish --access=${access}${verbose}`, deployDir);
   }
 
   spawnSync(`git checkout ${path.join(deployDir, 'package.json')}`); // cleanup
   spawnSync(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
 
-  if (!disableGitTag) {
+  if (disableGitTag) {
+    console.log('Git tagging disabled... Skipping');
+  } else {
     spawnSync(`git tag ${newVersion}`);
     const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
     spawnSync(`git push ${remote} --tags`);
   }
-};
+}
 
 run();
