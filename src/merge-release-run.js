@@ -21,16 +21,16 @@ if (debug) {
 
 /**
  * @param {string} command
- * @param {string} cwd
+ * @param {import("child_process").SpawnSyncOptions} options
  * @returns {ReturnType<typeof _spawnSync>}
  */
-function spawnSync(command, cwd) {
+function spawnSync(command, options) {
   if (debug) {
-    console.debug(`Spawning shell to run command "${command}"`);
+    console.debug(`Spawning process to run command: $ ${command}`);
   }
 
   const [cmd, ...args] = command.split(' ');
-  const ret = _spawnSync(cmd, args, { cwd, stdio: 'inherit' });
+  const ret = _spawnSync(cmd, args, { stdio: 'inherit', ...options });
 
   if (ret.status) {
     console.error(ret);
@@ -49,12 +49,12 @@ function spawnSync(command, cwd) {
 function execSync(command, options) {
   try {
     if (debug) {
-      console.debug(`Running command "${command}".`);
+      console.debug(`Running command: $ ${command}.`);
     }
 
     return _execSync(command, options);
   } catch (e) {
-    console.error(`Failed to run command "${command}"`, e);
+    console.error(`Failed to run command: $ ${command}`, e);
     throw e;
   }
 }
@@ -211,14 +211,14 @@ async function run() {
   console.log('   New Version:', newVersion);
 
   if (pkg?.scripts?.publish) {
-    spawnSync(`npm run publish`, deployDir);
+    spawnSync(`npm run publish`, { cwd: deployDir });
   } else {
     const verbose = debug ? ' --verbose' : '';
-    spawnSync(`npm publish --access=${access}${verbose}`, deployDir);
+    spawnSync(`npm publish --access=${access}${verbose}`, { cwd: deployDir });
   }
 
   spawnSync('git restore .'); // Cleanup changes in the git workspace
-  spawnSync(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
+  spawnSync(`echo "version=${newVersion}" >> "$GITHUB_OUTPUT"`, { shell: true });
 
   if (disableGitTag) {
     console.log('Git tagging disabled... Skipping');
