@@ -70,6 +70,7 @@ function isMajorChange(message) {
   return !!(
     firstLine.includes('!:') ||
     message.includes('BREAKING CHANGE') ||
+    message.includes('BREAKING-CHANGE') ||
     (majorTypes.length && majorTypesRegex.test(firstLine))
   );
 }
