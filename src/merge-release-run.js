@@ -85,7 +85,10 @@ function isMinorChange(message) {
   return minorTypesRegex.test(firstLine);
 }
 
-const registryUrl = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/';
+let registryUrl = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/';
+if (!registryUrl.endsWith('/')) {
+  registryUrl = `${registryUrl}/`;
+}
 const getFromRegistry = bent('json', registryUrl);
 const event = JSON.parse(fs.readFileSync('/github/workflow/event.json').toString());
 const deployDir = path.join(process.cwd(), process.env.DEPLOY_DIR || '.');

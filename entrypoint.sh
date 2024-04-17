@@ -25,7 +25,7 @@ export NPM_STRICT_SSL="${INPUT_NPM_STRICT_SSL:-"$NPM_STRICT_SSL"}"
 NPM_STRICT_SSL="${NPM_STRICT_SSL:-"true"}"
 NPM_REGISTRY_SCHEME="https"
 if ! [ "$NPM_STRICT_SSL" = "true" ]; then NPM_REGISTRY_SCHEME="http"; fi
-NPM_REGISTRY_DOMAIN="$(echo "${NPM_REGISTRY_URL:-registry.npmjs.org}" | sed -r 's/https?:\/\///')"
+NPM_REGISTRY_DOMAIN="$(echo "${NPM_REGISTRY_URL:-registry.npmjs.org}" | sed -r 's/https?:\/\///' | sed -r 's/\/+$//')"
 NPM_REGISTRY_URL="${NPM_REGISTRY_SCHEME}://$NPM_REGISTRY_DOMAIN"
 NPM_CONFIG_USERCONFIG="${NPM_CONFIG_USERCONFIG:-"$HOME/.npmrc"}"
 
@@ -40,7 +40,7 @@ if [ -n "$NPM_CUSTOM_NPMRC" ]; then
   echo "$NPM_CUSTOM_NPMRC" > "$NPM_CONFIG_USERCONFIG"
   chmod 0600 "$NPM_CONFIG_USERCONFIG"
 elif [ -n "$NPM_AUTH_TOKEN" ]; then
-  printf "//%s/:_authToken=%s\\nregistry=%s\\nstrict-ssl=%s" "$NPM_REGISTRY_DOMAIN" "$NPM_AUTH_TOKEN" "$NPM_REGISTRY_URL" "$NPM_STRICT_SSL" > "$NPM_CONFIG_USERCONFIG"
+  printf "//%s/:_authToken=%s\\nregistry=%s\\nstrict-ssl=%s" "$NPM_REGISTRY_DOMAIN" "$NPM_AUTH_TOKEN" "${NPM_REGISTRY_URL}/" "$NPM_STRICT_SSL" > "$NPM_CONFIG_USERCONFIG"
   chmod 0600 "$NPM_CONFIG_USERCONFIG"
 fi
 
