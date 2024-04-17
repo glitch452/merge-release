@@ -3,12 +3,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import bent from 'bent';
-import simpleGit from 'simple-git';
+import { simpleGit } from 'simple-git';
 import { execSync as _execSync, spawnSync as _spawnSync } from 'child_process';
-import { promisify } from 'util';
 
 const git = simpleGit();
-const gitLog = promisify(git.log.bind(git));
 
 const debug = process.env.DEBUG?.toLowerCase() === 'true';
 const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
@@ -132,7 +130,7 @@ async function run() {
       }
 
       try {
-        const logs = await gitLog({ from: latest.gitHead, to: process.env.GITHUB_SHA });
+        const logs = await git.log({ from: latest.gitHead, to: process.env.GITHUB_SHA });
         if (debug) {
           console.debug('git logs retrieved:', logs);
         }
