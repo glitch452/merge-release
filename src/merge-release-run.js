@@ -153,7 +153,7 @@ async function run() {
       console.debug('Log retrieval using latest failed, using event commits instead:', event.commits);
     }
 
-    messages = (event.commits || []).map((commit) => commit.message + '\n' + commit.body);
+    messages = (event.commits || []).map((commit) => `${commit.message}\n'${commit.body ?? ''}`);
   }
 
   if (debug) {
