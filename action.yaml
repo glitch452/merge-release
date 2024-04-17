@@ -25,6 +25,9 @@ inputs:
   MINOR_TYPES:
     description: A list of conventional commit types (separated by a |) to consider a release as a minor release
     required: false
+  MAJOR_TYPES:
+    description: A list of conventional commit types (separated by a |) to consider a release as a major release
+    required: false
   DISABLE_GIT_TAG:
     description: Set to `true` to disable the git tag feature
     required: false

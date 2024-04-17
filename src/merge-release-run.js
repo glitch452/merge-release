@@ -12,6 +12,8 @@ const debug = process.env.DEBUG?.toLowerCase() === 'true';
 const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
 const minorTypes = process.env.MINOR_TYPES || 'feat';
 const minorTypesRegex = new RegExp(`^(${minorTypes})`);
+const majorTypes = process.env.MAJOR_TAGS ?? '';
+const majorTypesRegex = new RegExp(`^(${majorTypes})`);
 
 /**
  * @param {string} command
@@ -65,7 +67,11 @@ function setVersion(version, packageDir) {
 /** @param {string} message */
 function isMajorChange(message) {
   const firstLine = message.split(/\r?\n/)[0].toLowerCase();
-  return !!(message.includes('BREAKING CHANGE') || firstLine.includes('!:'));
+  return !!(
+    firstLine.includes('!:') ||
+    message.includes('BREAKING CHANGE') ||
+    (majorTypes.length && majorTypesRegex.test(firstLine))
+  );
 }
 
 /** @param {string} message */
@@ -91,6 +97,7 @@ console.log(`  Using src directory (package.json): ${srcPackageDir}`);
 console.log(`           Deploy to NPM with access: ${access}`);
 console.log(`                         Git Tagging: ${disableGitTag ? 'Disabled' : 'Enabled'}`);
 console.log(`                         Minor Types: ${minorTypes}`);
+console.log(`                         Major Types: ${majorTypes}`);
 
 async function run() {
   const pkg = JSON.parse(fs.readFileSync(path.join(deployDir, 'package.json')));
