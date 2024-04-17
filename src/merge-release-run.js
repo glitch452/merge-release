@@ -6,8 +6,6 @@ import bent from 'bent';
 import { simpleGit } from 'simple-git';
 import { execSync as _execSync, spawnSync as _spawnSync } from 'child_process';
 
-const git = simpleGit();
-
 const debug = process.env.DEBUG?.toLowerCase() === 'true';
 const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
 const minorTypes = process.env.MINOR_TYPES || 'feat';
@@ -22,9 +20,10 @@ if (debug) {
 /**
  * @param {string} command
  * @param {import("child_process").SpawnSyncOptions} options
+ * @param {boolean} exitOnNonZero
  * @returns {ReturnType<typeof _spawnSync>}
  */
-function spawnSync(command, options) {
+function spawnSync(command, options, exitOnNonZero = true) {
   if (debug) {
     console.debug(`Spawning process to run command: $ ${command}`);
   }
@@ -35,7 +34,9 @@ function spawnSync(command, options) {
   if (ret.status) {
     console.error(ret);
     console.error(`Error: "${command}" returned non-zero exit code`);
-    process.exit(ret.status);
+    if (exitOnNonZero) {
+      process.exit(ret.status);
+    }
   }
 
   return ret;
@@ -108,6 +109,9 @@ console.log(`                         Minor Types: ${minorTypes}`);
 console.log(`                         Major Types: ${majorTypes}`);
 
 async function run() {
+  const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
+
+  const git = simpleGit();
   const pkg = JSON.parse(fs.readFileSync(path.join(deployDir, 'package.json')));
 
   if (!process.env.NPM_AUTH_TOKEN) {
@@ -132,6 +136,28 @@ async function run() {
     }
   }
 
+  spawnSync(`git config --list`);
+
+  spawnSync(`git tag`);
+  spawnSync(`git branch -a`);
+  spawnSync(`git log --oneline`);
+
+  // spawnSync(`git fetch merge-release`);
+  // spawnSync(`git fetch merge-release --tags`);
+  // spawnSync(`git fetch --shallow-exclude ${latest.gitHead} merge-release`);
+  // spawnSync(`git fetch --deepen 6 merge-release`);
+  spawnSync(`git fetch --update-shallow --shallow-exclude da61d44 merge-release`);
+  // spawnSync(`git fetch --deepen 1 merge-release`);
+  // spawnSync(`git fetch --shallow-exclude a039f47 merge-release`);
+
+  spawnSync(`git tag`);
+  spawnSync(`git branch -a`);
+  spawnSync(`git log --oneline`);
+
+  console.log('event.pull_request:', event);
+
+  return;
+
   /** @type {string[] | undefined} */
   let messages;
 
@@ -147,12 +173,23 @@ async function run() {
       }
 
       try {
+        spawnSync(`git tag`);
+        spawnSync(`git fetch`);
+        spawnSync(`git config --list`);
+        // git config --list
+        // Make sure we have the git history since the default depth is 1
+        // await git.fetch(remote);
+        // await git.fetch(['--shallow-exclude', latest.gitHead, 'merge-release']);
+        // await git.fetch(['--deepen', '2', 'merge-release']);
+        spawnSync(`git tag`);
+
         const logs = await git.log({ from: latest.gitHead, to: process.env.GITHUB_SHA });
+
         if (debug) {
           console.debug('git logs retrieved:', logs);
         }
 
-        messages = logs.all.map((r) => r.message + '\n' + r.body);
+        messages = logs.all.map((r) => `${r.message}\n${r.body}`);
       } catch (e) {
         if (debug) {
           console.debug('git log failed. Error:', e);
@@ -170,7 +207,7 @@ async function run() {
       console.debug('Log retrieval using latest failed, using event commits instead:', event.commits);
     }
 
-    messages = (event.commits || []).map((commit) => `${commit.message}\n'${commit.body ?? ''}`);
+    messages = (event.commits || []).map((commit) => `${commit.message}\n${commit.body ?? ''}`);
   }
 
   if (debug) {
@@ -183,6 +220,9 @@ async function run() {
   } else if (messages.map(isMinorChange).includes(true)) {
     incrementType = 'minor';
   }
+
+  // TODO: Delete when done testing
+  incrementType = 'patch';
 
   if (debug) {
     console.debug('version incrementType type:', incrementType);
@@ -224,7 +264,6 @@ async function run() {
     console.log('Git tagging disabled... Skipping');
   } else {
     spawnSync(`git tag ${newVersion}`);
-    const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
     spawnSync(`git push ${remote} --tags`);
   }
 }
