@@ -15,6 +15,10 @@ const minorTypesRegex = new RegExp(`^(${minorTypes})`);
 const majorTypes = process.env.MAJOR_TAGS ?? '';
 const majorTypesRegex = new RegExp(`^(${majorTypes})`);
 
+if (debug) {
+  console.debug('Environment Variables:', process.env);
+}
+
 /**
  * @param {string} command
  * @param {string} cwd
