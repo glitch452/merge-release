@@ -4,23 +4,64 @@ import * as fs from 'fs';
 import * as path from 'path';
 import bent from 'bent';
 import simpleGit from 'simple-git';
-import { execSync, spawnSync } from 'child_process';
+import { execSync as _execSync, spawnSync as _spawnSync } from 'child_process';
 import { promisify } from 'util';
 
 const git = simpleGit();
+const gitLog = promisify(git.log.bind(git));
 
-const exec = (str, cwd) => {
-  const [cmd, ...args] = str.split(' ');
-  const ret = spawnSync(cmd, args, { cwd, stdio: 'inherit' });
+const minorTagsRegex = new RegExp('^(feat)');
+
+/**
+ * @param {string} command
+ * @param {string} cwd
+ * @returns {ReturnType<typeof _spawnSync>}
+ */
+function spawnSync(command, cwd) {
+  const [cmd, ...args] = command.split(' ');
+  const ret = _spawnSync(cmd, args, { cwd, stdio: 'inherit' });
   if (ret.status) {
     console.error(ret);
-    console.error(`Error: ${str} returned non-zero exit code`);
+    console.error(`Error: "${command}" returned non-zero exit code`);
     process.exit(ret.status);
   }
   return ret;
-};
+}
 
-const getlog = promisify(git.log.bind(git));
+/**
+ * @param {Parameters<typeof _execSync>[0]} command
+ * @param {Parameters<typeof _execSync>[1]} options
+ * @returns {ReturnType<typeof _execSync>}
+ */
+function execSync(command, options) {
+  try {
+    return _execSync(command, options);
+  } catch (e) {
+    console.error(`Failed to run command "${command}"`);
+    throw e;
+  }
+}
+
+/**
+ * @param {string} version
+ * @param {string} packageDir
+ */
+function setVersion(version, packageDir) {
+  const json = execSync(`jq '.version="${version}"' package.json`, { cwd: packageDir });
+  fs.writeFileSync(path.join(packageDir, 'package.json'), json);
+}
+
+/** @param {string} message */
+function isMajorChange(message) {
+  const firstLine = message.split(/\r?\n/)[0].toLowerCase();
+  return !!(message.includes('BREAKING CHANGE') || firstLine.includes('!:'));
+}
+
+/** @param {string} message */
+function isMinorChange(message) {
+  const firstLine = message.split(/\r?\n/)[0].toLowerCase();
+  return minorTagsRegex.test(firstLine);
+}
 
 const get = bent('json', process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/');
 
@@ -49,13 +90,14 @@ const run = async () => {
     // unpublished
   }
 
+  /** @type {string[] | undefined} */
   let messages;
 
   if (latest) {
     if (latest.gitHead === process.env.GITHUB_SHA) return console.log('SHA matches latest release, skipping.');
     if (latest.gitHead) {
       try {
-        let logs = await getlog({
+        let logs = await gitLog({
           from: latest.gitHead,
           to: process.env.GITHUB_SHA,
         });
@@ -73,30 +115,21 @@ const run = async () => {
   }
 
   let version = 'patch';
-  if (messages.map((message) => message.includes('BREAKING CHANGE') || message.includes('!:')).includes(true)) {
+  if (messages.map(isMajorChange).includes(true)) {
     version = 'major';
-  } else if (messages.map((message) => message.toLowerCase().startsWith('feat')).includes(true)) {
+  } else if (messages.map(isMinorChange).includes(true)) {
     version = 'minor';
   }
-
-  const setVersion = (version) => {
-    const json = execSync(`jq '.version="${version}"' package.json`, {
-      cwd: srcPackageDir,
-    });
-    fs.writeFileSync(path.join(srcPackageDir, 'package.json'), json);
-
-    if (deployDir !== './') {
-      const deployJson = execSync(`jq '.version="${version}"' package.json`, {
-        cwd: deployDir,
-      });
-      fs.writeFileSync(path.join(deployDir, 'package.json'), deployJson);
-    }
-  };
 
   let currentVersion = execSync(`npm view ${pkg.name} version`, {
     cwd: srcPackageDir,
   }).toString();
-  setVersion(currentVersion);
+
+  setVersion(currentVersion, srcPackageDir);
+  if (srcPackageDir !== deployDir) {
+    setVersion(currentVersion, deployDir);
+  }
+
   console.log('current:', currentVersion, '/', 'version:', version);
   let newVersion = execSync(`npm version --git-tag-version=false ${version}`, {
     cwd: srcPackageDir,
@@ -106,22 +139,27 @@ const run = async () => {
     .split(/(\r\n|\n|\r)/gm)
     .filter((word) => !/(\r\n|\n|\r)/.test(word))
     .pop();
-  setVersion(newVersion.slice(1));
+
+  setVersion(newVersion.slice(1), srcPackageDir);
+  if (srcPackageDir !== deployDir) {
+    setVersion(newVersion.slice(1), deployDir);
+  }
+
   console.log('new version:', newVersion);
 
   if (pkg.scripts && pkg.scripts.publish) {
-    exec(`npm run publish`, deployDir);
+    spawnSync(`npm run publish`, deployDir);
   } else {
-    exec(`npm publish --access=${access}`, deployDir);
+    spawnSync(`npm publish --access=${access}`, deployDir);
   }
 
-  exec(`git checkout ${path.join(deployDir, 'package.json')}`); // cleanup
-  exec(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
+  spawnSync(`git checkout ${path.join(deployDir, 'package.json')}`); // cleanup
+  spawnSync(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
 
   if (!disableGitTag) {
-    exec(`git tag ${newVersion}`);
+    spawnSync(`git tag ${newVersion}`);
     const remote = `https://${process.env.GITHUB_ACTOR}:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`;
-    exec(`git push ${remote} --tags`);
+    spawnSync(`git push ${remote} --tags`);
   }
 };
 
