@@ -1,11 +1,18 @@
 name: Merge Release
 description: Deploy your package to NPM and Github using semantic versioning
+
 branding:
   icon: upload-cloud
   color: purple
+
 runs:
   using: docker
   image: Dockerfile
+
+outputs:
+  version:
+    description: The new version used as the release version
+
 inputs:
   GITHUB_TOKEN:
     description: Github token to allow tagging the version
