@@ -22,6 +22,9 @@ inputs:
   NPM_REGISTRY_URL:
     description: NPM_REGISTRY_URL
     required: false
+  MINOR_TYPES:
+    description: A list of conventional commit types (separated by a |) to consider a release as a minor release
+    required: false
   DISABLE_GIT_TAG:
     description: Set to `true` to disable the git tag feature
     required: false

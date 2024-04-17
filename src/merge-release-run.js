@@ -10,7 +10,8 @@ const git = simpleGit();
 
 const debug = process.env.DEBUG?.toLowerCase() === 'true';
 const disableGitTag = process.env.DISABLE_GIT_TAG?.toLowerCase() === 'true';
-const minorTagsRegex = new RegExp('^(feat)');
+const minorTypes = process.env.MINOR_TYPES || 'feat';
+const minorTypesRegex = new RegExp(`^(${minorTypes})`);
 
 /**
  * @param {string} command
@@ -70,7 +71,7 @@ function isMajorChange(message) {
 /** @param {string} message */
 function isMinorChange(message) {
   const firstLine = message.split(/\r?\n/)[0].toLowerCase();
-  return minorTagsRegex.test(firstLine);
+  return minorTypesRegex.test(firstLine);
 }
 
 const registryUrl = process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org/';
@@ -89,6 +90,7 @@ console.log(`              Using deploy directory: ${deployDir}`);
 console.log(`  Using src directory (package.json): ${srcPackageDir}`);
 console.log(`           Deploy to NPM with access: ${access}`);
 console.log(`                         Git Tagging: ${disableGitTag ? 'Disabled' : 'Enabled'}`);
+console.log(`                         Minor Types: ${minorTypes}`);
 
 async function run() {
   const pkg = JSON.parse(fs.readFileSync(path.join(deployDir, 'package.json')));
