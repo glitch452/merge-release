@@ -185,7 +185,7 @@ async function run() {
     console.debug('version incrementType type:', incrementType);
   }
 
-  let currentVersion = execSync(`npm view ${pkg.name} version`, { cwd: srcPackageDir }).toString().trim();
+  const currentVersion = execSync(`npm view ${pkg.name} version`, { cwd: srcPackageDir }).toString().trim();
 
   setVersion(currentVersion, srcPackageDir);
   if (srcPackageDir !== deployDir) {
@@ -214,7 +214,7 @@ async function run() {
     spawnSync(`npm publish --access=${access}${verbose}`, deployDir);
   }
 
-  spawnSync(`git checkout ${path.join(deployDir, 'package.json')}`); // cleanup
+  spawnSync('git restore .'); // Cleanup changes in the git workspace
   spawnSync(`echo "version=${newVersion}" >> $GITHUB_OUTPUT`);
 
   if (disableGitTag) {
